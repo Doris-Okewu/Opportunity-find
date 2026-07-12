@@ -31,14 +31,21 @@ export default function OpportunitiesPage() {
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Browse Opportunities</h1>
-        <p className="mt-1 text-slate-600 dark:text-slate-400">
-          {loading ? 'Loading listings...' : `${filtered.length} opportunit${filtered.length === 1 ? 'y' : 'ies'} found`}
+        <h1 className="text-3xl font-bold text-ink">Browse Opportunities</h1>
+        <p className="mt-1 text-ink-2">
+          Jobs, internships, scholarships, fellowships, grants, competitions, tech programs, and NYSC placements —
+          every listing verified before it goes live.
         </p>
       </div>
 
       <div className="mb-6">
         <FilterBar filters={filters} onChange={setFilters} />
+      </div>
+
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm font-medium text-ink-2">
+          {loading ? 'Loading listings...' : `${filtered.length} opportunit${filtered.length === 1 ? 'y' : 'ies'} found`}
+        </p>
       </div>
 
       {error && <ErrorState message={error} onRetry={refetch} />}

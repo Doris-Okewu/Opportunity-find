@@ -59,8 +59,8 @@ export default function AdminDashboardPage() {
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Admin Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          <h1 className="text-2xl font-bold text-ink">Admin Dashboard</h1>
+          <p className="mt-1 text-sm text-ink-2">
             {loading ? 'Loading...' : `${opportunities.length} total opportunities`}
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {actionError && (
-        <p className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">
+        <p className="mb-4 rounded-lg bg-danger/10 px-4 py-2 text-sm text-danger">
           {actionError}
         </p>
       )}
@@ -84,7 +84,7 @@ export default function AdminDashboardPage() {
 
       {!error && loading && (
         <div className="flex justify-center py-24">
-          <Spinner className="h-6 w-6 text-indigo-600" />
+          <Spinner className="h-6 w-6 text-brand" />
         </div>
       )}
 

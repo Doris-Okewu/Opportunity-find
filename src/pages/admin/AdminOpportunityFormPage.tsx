@@ -4,6 +4,7 @@ import type { OpportunityInput } from '../../types/opportunity';
 import { createOpportunity, getOpportunityById, updateOpportunity } from '../../lib/queries/opportunities';
 import OpportunityForm, { BLANK_OPPORTUNITY } from '../../components/admin/OpportunityForm';
 import Spinner from '../../components/ui/Spinner';
+import Card from '../../components/ui/Card';
 
 export default function AdminOpportunityFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ export default function AdminOpportunityFormPage() {
           setLoadError('Opportunity not found.');
           return;
         }
-        const { id: _id, created_at, updated_at, ...rest } = data;
+        const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...rest } = data;
         setInitialValues(rest);
       })
       .catch((err) => setLoadError(err instanceof Error ? err.message : 'Failed to load opportunity.'));
@@ -48,30 +49,32 @@ export default function AdminOpportunityFormPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
-      <Link to="/admin" className="mb-6 inline-block text-sm font-medium text-indigo-600 dark:text-indigo-400">
+      <Link to="/admin" className="mb-6 inline-block text-sm font-medium text-brand">
         &larr; Back to Dashboard
       </Link>
 
-      <h1 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">
+      <h1 className="mb-8 text-2xl font-bold text-ink">
         {isEdit ? 'Edit Opportunity' : 'New Opportunity'}
       </h1>
 
-      {loadError && <p className="text-sm text-red-600 dark:text-red-400">{loadError}</p>}
+      {loadError && <p className="text-sm text-danger">{loadError}</p>}
 
       {!loadError && !initialValues && (
         <div className="flex justify-center py-16">
-          <Spinner className="h-6 w-6 text-indigo-600" />
+          <Spinner className="h-6 w-6 text-brand" />
         </div>
       )}
 
       {!loadError && initialValues && (
-        <OpportunityForm
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-          submitLabel={isEdit ? 'Save Changes' : 'Create Opportunity'}
-          submitting={submitting}
-          error={submitError}
-        />
+        <Card>
+          <OpportunityForm
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+            submitLabel={isEdit ? 'Save Changes' : 'Create Opportunity'}
+            submitting={submitting}
+            error={submitError}
+          />
+        </Card>
       )}
     </div>
   );

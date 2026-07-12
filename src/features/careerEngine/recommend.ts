@@ -1,6 +1,8 @@
 import type { Opportunity } from '../../types/opportunity';
 import { isExpired } from '../../utils/date';
 import { getCareerPath } from './careerPaths';
+import { getPersonalizedCareerContent } from './personalize';
+import type { PersonalizedCareerContent } from './personalize';
 import type { OnboardingProfile } from './types';
 
 const MAX_RESULTS = 12;
@@ -21,11 +23,13 @@ function scoreOpportunity(opportunity: Opportunity, profile: OnboardingProfile):
 
 export interface RecommendationResult {
   careerPath: ReturnType<typeof getCareerPath>;
+  personalized: PersonalizedCareerContent | undefined;
   matchedOpportunities: Opportunity[];
 }
 
 export function recommend(profile: OnboardingProfile, opportunities: Opportunity[]): RecommendationResult {
   const careerPath = getCareerPath(profile.careerPath);
+  const personalized = getPersonalizedCareerContent(profile.careerPath, profile.experienceLevel);
 
   const scored = opportunities
     .filter((opp) => opp.is_published && !isExpired(opp.deadline))
@@ -40,6 +44,7 @@ export function recommend(profile: OnboardingProfile, opportunities: Opportunity
 
   return {
     careerPath,
+    personalized,
     matchedOpportunities: scored.slice(0, MAX_RESULTS).map(({ opp }) => opp),
   };
 }

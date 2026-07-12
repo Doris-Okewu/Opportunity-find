@@ -3,6 +3,10 @@
 -- paths, and experience levels, including a few expired ones (to verify
 -- expired-filtering) and a few with no deadline (rolling).
 --
+-- Idempotent: relies on the opportunities_title_org_url_key unique index
+-- (schema.sql) plus ON CONFLICT DO NOTHING below, so re-running this file
+-- against an already-seeded database is a no-op rather than creating dupes.
+--
 -- career_tags values match the career path slugs used in
 -- src/features/careerEngine/careerPaths.ts:
 --   frontend, backend, data, design, product, marketing, cybersecurity, devops
@@ -164,4 +168,6 @@ values
 
 ('Data Analyst Internship', 'PastDeadline Analytics', 'internship', '{data}', '{Excel,SQL}', 'student', 'Remote', true,
  'This listing has already closed — used to verify expired-filtering behavior.',
- 'https://example.com/careers', '2026-06-20', true);
+ 'https://example.com/careers', '2026-06-20', true)
+
+on conflict (title, organization, application_url) do nothing;

@@ -34,6 +34,13 @@ create index if not exists opportunities_is_published_idx on opportunities (is_p
 create index if not exists opportunities_deadline_idx on opportunities (deadline);
 create index if not exists opportunities_career_tags_idx on opportunities using gin (career_tags);
 
+-- Prevents duplicate rows from a re-run of seed.sql (or an accidental double
+-- insert). Same title+organization+application_url is treated as the same
+-- listing; genuinely distinct listings are extremely unlikely to collide on
+-- all three.
+create unique index if not exists opportunities_title_org_url_key
+  on opportunities (title, organization, application_url);
+
 -- keep updated_at current on every row change
 create or replace function set_updated_at()
 returns trigger as $$

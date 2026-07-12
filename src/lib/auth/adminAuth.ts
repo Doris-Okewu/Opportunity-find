@@ -11,6 +11,18 @@ export async function signOutAdmin() {
   await supabase.auth.signOut();
 }
 
+export async function requestPasswordReset(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/admin/reset-password`,
+  });
+  if (error) throw error;
+}
+
+export async function updatePassword(newPassword: string) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+}
+
 async function checkIsAdmin(userId: string): Promise<boolean> {
   const { data, error } = await supabase.from('admins').select('user_id').eq('user_id', userId).maybeSingle();
   if (error) return false;

@@ -8,7 +8,7 @@ export default function AdminGuard() {
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center py-24">
-        <Spinner className="h-6 w-6 text-indigo-600" />
+        <Spinner className="h-6 w-6 text-brand" />
       </div>
     );
   }

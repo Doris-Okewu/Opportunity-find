@@ -36,7 +36,7 @@ export default function FilterBar({
     filters.remote !== 'all';
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm">
       <TextInput
         type="search"
         placeholder="Search by title, organization, or keyword..."
@@ -45,7 +45,9 @@ export default function FilterBar({
         aria-label="Search opportunities"
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-3">Filters</p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Select
           value={filters.type}
           onChange={(e) => onChange({ ...filters, type: e.target.value as OpportunityFilters['type'] })}
@@ -96,6 +98,7 @@ export default function FilterBar({
           <option value="remote">Remote only</option>
           <option value="onsite">On-site only</option>
         </Select>
+        </div>
       </div>
 
       {hasActiveFilters && (

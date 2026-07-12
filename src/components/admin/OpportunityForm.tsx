@@ -73,18 +73,18 @@ export default function OpportunityForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">Title</label>
+          <label className="mb-1 block text-sm font-medium text-ink">Title</label>
           <Input required value={values.title} onChange={(e) => update('title', e.target.value)} />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">Organization</label>
+          <label className="mb-1 block text-sm font-medium text-ink">Organization</label>
           <Input required value={values.organization} onChange={(e) => update('organization', e.target.value)} />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">Type</label>
+          <label className="mb-1 block text-sm font-medium text-ink">Type</label>
           <Select value={values.type} onChange={(e) => update('type', e.target.value as OpportunityType)}>
             {Object.entries(OPPORTUNITY_TYPE_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -94,7 +94,7 @@ export default function OpportunityForm({
           </Select>
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">Experience Level</label>
+          <label className="mb-1 block text-sm font-medium text-ink">Experience Level</label>
           <Select
             value={values.experience_level}
             onChange={(e) => update('experience_level', e.target.value as ExperienceLevel)}
@@ -109,8 +109,8 @@ export default function OpportunityForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-slate-900 dark:text-white">
-          Career Paths <span className="font-normal text-slate-500">(select all that apply)</span>
+        <label className="mb-2 block text-sm font-medium text-ink">
+          Career Paths <span className="font-normal text-ink-3">(select all that apply)</span>
         </label>
         <div className="flex flex-wrap gap-2">
           {CAREER_PATHS.map((path) => {
@@ -120,10 +120,8 @@ export default function OpportunityForm({
                 type="button"
                 key={path.slug}
                 onClick={() => toggleCareerTag(path.slug)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                  selected
-                    ? 'border-indigo-600 bg-indigo-600 text-white'
-                    : 'border-slate-300 text-slate-600 hover:border-slate-400 dark:border-slate-700 dark:text-slate-300'
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  selected ? 'border-brand bg-brand text-white' : 'border-border-strong text-ink-2 hover:border-ink-3'
                 }`}
               >
                 {path.label}
@@ -134,8 +132,8 @@ export default function OpportunityForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">
-          Required Skills <span className="font-normal text-slate-500">(comma-separated)</span>
+        <label className="mb-1 block text-sm font-medium text-ink">
+          Required Skills <span className="font-normal text-ink-3">(comma-separated)</span>
         </label>
         <Input
           value={skillsText}
@@ -146,7 +144,7 @@ export default function OpportunityForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">Location</label>
+          <label className="mb-1 block text-sm font-medium text-ink">Location</label>
           <Input
             value={values.location ?? ''}
             onChange={(e) => update('location', e.target.value)}
@@ -160,16 +158,16 @@ export default function OpportunityForm({
             type="checkbox"
             checked={values.remote}
             onChange={(e) => update('remote', e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300"
+            className="h-4 w-4 rounded border-border-strong"
           />
-          <label htmlFor="remote" className="text-sm font-medium text-slate-900 dark:text-white">
+          <label htmlFor="remote" className="text-sm font-medium text-ink">
             This is a remote opportunity
           </label>
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">Description</label>
+        <label className="mb-1 block text-sm font-medium text-ink">Description</label>
         <Textarea
           required
           rows={5}
@@ -180,7 +178,7 @@ export default function OpportunityForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">
+          <label className="mb-1 block text-sm font-medium text-ink">
             Official Application URL
           </label>
           <Input
@@ -192,8 +190,8 @@ export default function OpportunityForm({
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-900 dark:text-white">
-            Deadline <span className="font-normal text-slate-500">(leave blank for rolling)</span>
+          <label className="mb-1 block text-sm font-medium text-ink">
+            Deadline <span className="font-normal text-ink-3">(leave blank for rolling)</span>
           </label>
           <Input
             type="date"
@@ -209,14 +207,14 @@ export default function OpportunityForm({
           type="checkbox"
           checked={values.is_published}
           onChange={(e) => update('is_published', e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300"
+          className="h-4 w-4 rounded border-border-strong"
         />
-        <label htmlFor="is_published" className="text-sm font-medium text-slate-900 dark:text-white">
+        <label htmlFor="is_published" className="text-sm font-medium text-ink">
           Published (visible to the public)
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <Button type="submit" disabled={submitting}>
         {submitting ? 'Saving...' : submitLabel}

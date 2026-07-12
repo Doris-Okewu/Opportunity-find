@@ -2,12 +2,152 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-html,
-body,
-#root {
-  height: 100%;
+/*
+ * Waypoint design tokens — Phase 1 foundation.
+ *
+ * Color roles (kept from the approved audit):
+ *   brand    = primary actions / core identity (indigo)
+ *   ai       = AI-generated features only (violet)
+ *   journey  = progress / direction / stage (cyan)
+ *   milestone = meaningful, earned progress moments (amber)
+ *   success / danger = existing semantic meanings, unchanged in spirit
+ *
+ * These are NEW token names layered alongside Tailwind's existing slate/
+ * indigo palette — existing `slate-*`/`indigo-*` usages are untouched here
+ * and are migrated deliberately, component by component, in later phases.
+ *
+ * --radius-lg/xl/2xl and --shadow-sm/md/lg intentionally override
+ * Tailwind's own default scale (rather than adding new names) so every
+ * existing `rounded-lg`/`rounded-xl`/`shadow-sm` usage across the app
+ * picks up the refined values automatically, with no component edits.
+ */
+@theme {
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+
+  /* Light-mode canvas/surfaces: deliberately a visible cool periwinkle tint,
+   * not a near-white. White (`surface`) is reserved for elevated cards, not
+   * the page background — see the light-mode visual correction note below. */
+  --color-canvas: #e7e9f8;
+  --color-surface: #ffffff;
+  --color-surface-2: #f2f3fb;
+  --color-border: #d7dbf0;
+  --color-border-strong: #b7bee0;
+
+  --color-ink: #1b2033;
+  --color-ink-2: #5b6178;
+  --color-ink-3: #5f6580;
+
+  /* journey/milestone/danger/success are darkened from their first-pass
+   * values specifically so they stay WCAG AA (4.5:1) as *text* against the
+   * richer canvas above — background/border/icon usage at low opacity is
+   * unaffected by this, only direct text color. */
+  --color-brand: #4f46e5;
+  --color-ai: #7c3aed;
+  --color-journey: #0b6e85;
+  --color-milestone: #9a4508;
+  --color-success: #047548;
+  --color-danger: #c81e1e;
+
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.25rem;
+
+  --shadow-sm: 0 1px 2px rgba(30, 34, 70, 0.06);
+  --shadow-md: 0 4px 16px rgba(30, 34, 70, 0.08);
+  --shadow-lg: 0 12px 32px rgba(30, 34, 70, 0.12);
 }
 
-body {
-  @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+.dark {
+  --color-canvas: #0a0e1a;
+  --color-surface: #121729;
+  --color-surface-2: #1a2036;
+  --color-border: #262d45;
+  --color-border-strong: #333c5c;
+
+  --color-ink: #eef0fa;
+  --color-ink-2: #9ba1b8;
+  --color-ink-3: #8189a3;
+
+  --color-brand: #818cf8;
+  --color-ai: #a78bfa;
+  --color-journey: #22d3ee;
+  --color-milestone: #fbbf24;
+  --color-success: #34d399;
+  --color-danger: #f87171;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Phase 5 motion foundation. Two small, reusable keyframes — deliberately
+ * not a motion library. Every use is a one-time reveal on mount, never a
+ * loop; the `prefers-reduced-motion` rule above already neutralizes
+ * `animation-duration` to ~0ms globally, so nothing here needs its own
+ * reduced-motion branch.
+ */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-reveal {
+    animation: reveal-up 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-reveal-fade {
+    animation: reveal-fade 250ms ease-out both;
+  }
 }

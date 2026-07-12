@@ -15,9 +15,9 @@ export default function OpportunityTable({
   onDelete: (opportunity: Opportunity) => void;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+    <div className="overflow-x-auto rounded-xl border border-border bg-surface shadow-sm">
       <table className="w-full min-w-[720px] text-left text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
+        <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wide text-ink-3">
           <tr>
             <th className="px-4 py-3 font-medium">Title</th>
             <th className="px-4 py-3 font-medium">Type</th>
@@ -26,19 +26,19 @@ export default function OpportunityTable({
             <th className="px-4 py-3 font-medium">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+        <tbody className="divide-y divide-border">
           {opportunities.map((opportunity) => {
             const expired = isExpired(opportunity.deadline);
             return (
               <tr key={opportunity.id}>
                 <td className="px-4 py-3">
-                  <div className="font-medium text-slate-900 dark:text-white">{opportunity.title}</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">{opportunity.organization}</div>
+                  <div className="font-medium text-ink">{opportunity.title}</div>
+                  <div className="text-xs text-ink-3">{opportunity.organization}</div>
                 </td>
-                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                <td className="px-4 py-3 text-ink-2">
                   {OPPORTUNITY_TYPE_LABELS[opportunity.type]}
                 </td>
-                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
+                <td className="px-4 py-3 text-ink-2">
                   {formatDeadline(opportunity.deadline)}
                   {expired && (
                     <span className="ml-2">

@@ -1,0 +1,13 @@
+project_id = "xdrijanrthekahkjzcjy"
+
+# Regular app users are anonymous (no Supabase Auth session) and this
+# project uses the newer sb_publishable_/sb_secret_ key format rather than
+# legacy JWT-format keys. The default verify_jwt=true gateway check expects
+# a signed JWT and rejects the publishable key outright (it isn't a JWT),
+# before the function's own code ever runs — see
+# supabase/functions/ai-opportunity-insight/README.md for the full
+# diagnosis. This function's own request validation, sanitization, and
+# response checks (see requestValidation.ts / responseValidation.ts) are
+# the real authorization/safety boundary, independent of this setting.
+[functions.ai-opportunity-insight]
+verify_jwt = false

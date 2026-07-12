@@ -1,13 +1,18 @@
 import type { ReactNode } from 'react';
 
-type Tone = 'default' | 'indigo' | 'amber' | 'red' | 'green';
+type Tone = 'default' | 'indigo' | 'amber' | 'red' | 'green' | 'violet';
 
+// Prop names are unchanged so every existing call site across the app keeps
+// working without edits — only the underlying colors move onto the Waypoint
+// semantic tokens (indigo -> brand, red -> danger, green -> success). "violet"
+// is a new, additive tone for the AI role — nothing existing used it before.
 const TONE_CLASSES: Record<Tone, string> = {
-  default: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-  indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300',
-  amber: 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300',
-  red: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300',
-  green: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+  default: 'bg-surface-2 text-ink-2 border border-border',
+  indigo: 'bg-brand/10 text-brand dark:bg-brand/15',
+  amber: 'bg-milestone/10 text-milestone dark:bg-milestone/15',
+  red: 'bg-danger/10 text-danger dark:bg-danger/15',
+  green: 'bg-success/10 text-success dark:bg-success/15',
+  violet: 'bg-ai/10 text-ai dark:bg-ai/15',
 };
 
 export default function Badge({ children, tone = 'default' }: { children: ReactNode; tone?: Tone }) {

@@ -13,6 +13,9 @@ dist-ssr
 *.local
 .env
 
+# Supabase CLI local link/session metadata — machine-specific, never commit
+supabase/.temp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

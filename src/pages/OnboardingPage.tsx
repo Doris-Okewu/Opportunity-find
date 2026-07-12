@@ -52,8 +52,8 @@ export default function OnboardingPage() {
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Find My Path</h1>
-        <p className="mt-1 text-slate-600 dark:text-slate-400">
+        <h1 className="text-2xl font-bold text-ink">Find My Path</h1>
+        <p className="mt-1 text-ink-2">
           Answer a few quick questions to get personalized recommendations.
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function OnboardingPage() {
 
       {step === 1 && (
         <fieldset className="space-y-3">
-          <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
+          <legend className="mb-3 text-lg font-semibold text-ink">
             Which best describes you?
           </legend>
           {(Object.entries(APPLICANT_STATUS_LABELS) as [ApplicantStatus, string][]).map(([value, label]) => (
@@ -80,7 +80,7 @@ export default function OnboardingPage() {
 
       {step === 2 && (
         <fieldset className="space-y-3">
-          <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
+          <legend className="mb-3 text-lg font-semibold text-ink">
             Which career path interests you most?
           </legend>
           {CAREER_PATHS.map((path) => (
@@ -97,7 +97,7 @@ export default function OnboardingPage() {
 
       {step === 3 && (
         <fieldset className="space-y-3">
-          <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
+          <legend className="mb-3 text-lg font-semibold text-ink">
             What's your experience level?
           </legend>
           {(Object.entries(EXPERIENCE_LEVEL_LABELS) as [ExperienceLevel, string][]).map(([value, label]) => (
@@ -113,9 +113,9 @@ export default function OnboardingPage() {
 
       {step === 4 && (
         <fieldset className="space-y-3">
-          <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
+          <legend className="mb-3 text-lg font-semibold text-ink">
             What types of opportunities are you looking for?{' '}
-            <span className="font-normal text-slate-500">(select all that apply)</span>
+            <span className="font-normal text-ink-3">(select all that apply)</span>
           </legend>
           {(Object.entries(OPPORTUNITY_TYPE_LABELS) as [OpportunityType, string][]).map(([value, label]) => (
             <OptionButton
@@ -131,7 +131,7 @@ export default function OnboardingPage() {
       {step === 5 && (
         <fieldset className="space-y-6">
           <div>
-            <legend className="mb-3 text-lg font-semibold text-slate-900 dark:text-white">
+            <legend className="mb-3 text-lg font-semibold text-ink">
               Do you prefer remote or on-site opportunities?
             </legend>
             <div className="space-y-3">
@@ -153,8 +153,8 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <label htmlFor="location" className="mb-2 block text-sm font-medium text-slate-900 dark:text-white">
-              Preferred location <span className="font-normal text-slate-500">(optional)</span>
+            <label htmlFor="location" className="mb-2 block text-sm font-medium text-ink">
+              Preferred location <span className="font-normal text-ink-3">(optional)</span>
             </label>
             <Input
               id="location"
