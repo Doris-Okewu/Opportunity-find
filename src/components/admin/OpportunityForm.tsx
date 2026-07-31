@@ -8,21 +8,6 @@ import Select from '../ui/Select';
 import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
 
-export const BLANK_OPPORTUNITY: OpportunityInput = {
-  title: '',
-  organization: '',
-  type: 'job',
-  career_tags: [],
-  required_skills: [],
-  experience_level: 'entry',
-  location: '',
-  remote: false,
-  description: '',
-  application_url: '',
-  deadline: null,
-  is_published: true,
-};
-
 function toDateInputValue(deadline: string | null): string {
   if (!deadline) return '';
   return new Date(deadline).toISOString().slice(0, 10);

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useOpportunities } from '../hooks/useOpportunities';
-import FilterBar, { DEFAULT_FILTERS } from '../components/opportunities/FilterBar';
+import FilterBar from '../components/opportunities/FilterBar';
+import { DEFAULT_FILTERS } from '../components/opportunities/filters';
 import OpportunityCard from '../components/opportunities/OpportunityCard';
 import SkeletonCard from '../components/opportunities/SkeletonCard';
 import EmptyState from '../components/opportunities/EmptyState';

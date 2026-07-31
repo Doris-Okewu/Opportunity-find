@@ -3,23 +3,7 @@ import TextInput from '../ui/Input';
 import Button from '../ui/Button';
 import { CAREER_PATHS } from '../../features/careerEngine/careerPaths';
 import { OPPORTUNITY_TYPE_LABELS, EXPERIENCE_LEVEL_LABELS } from '../../types/opportunity';
-import type { OpportunityType, ExperienceLevel } from '../../types/opportunity';
-
-export interface OpportunityFilters {
-  search: string;
-  type: OpportunityType | 'all';
-  careerTag: string | 'all';
-  experienceLevel: ExperienceLevel | 'all';
-  remote: 'all' | 'remote' | 'onsite';
-}
-
-export const DEFAULT_FILTERS: OpportunityFilters = {
-  search: '',
-  type: 'all',
-  careerTag: 'all',
-  experienceLevel: 'all',
-  remote: 'all',
-};
+import { DEFAULT_FILTERS, type OpportunityFilters } from './filters';
 
 export default function FilterBar({
   filters,

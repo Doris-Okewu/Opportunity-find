@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import type { OpportunityInput } from '../../types/opportunity';
 import { createOpportunity, getOpportunityById, updateOpportunity } from '../../lib/queries/opportunities';
-import OpportunityForm, { BLANK_OPPORTUNITY } from '../../components/admin/OpportunityForm';
+import OpportunityForm from '../../components/admin/OpportunityForm';
+import { BLANK_OPPORTUNITY } from '../../components/admin/blankOpportunity';
 import Spinner from '../../components/ui/Spinner';
 import Card from '../../components/ui/Card';
 
