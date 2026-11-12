@@ -11,3 +11,7 @@ project_id = "xdrijanrthekahkjzcjy"
 # the real authorization/safety boundary, independent of this setting.
 [functions.ai-opportunity-insight]
 verify_jwt = false
+
+[functions.opportunity-sourcing]
+# Auth is enforced inside the function (Vault cron secret or an admin session).
+verify_jwt = false
