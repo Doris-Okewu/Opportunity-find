@@ -27,8 +27,8 @@ function bandFromDays(daysRemaining: number | null): DeadlineBand {
 
 const URGENCY_LABELS: Record<DeadlineBand, string> = {
   expired: 'Closed',
-  critical: 'Critical — act today',
-  urgent: 'Urgent — this week',
+  critical: 'Critical: act today',
+  urgent: 'Urgent: this week',
   focused: 'Focused preparation window',
   roadmap: 'Roadmap phase',
   phased: 'Phased preparation',
@@ -51,106 +51,102 @@ export function buildDeadlinePlan(type: OpportunityType, deadline: string | null
     switch (band) {
       case 'expired':
         return {
-          highestPriorityAction: 'This opportunity has closed — no application plan is needed.',
+          highestPriorityAction: 'This opportunity has closed, so there is nothing left to submit.',
           realisticallyAchievable: [],
-          avoidPrioritizing: ['Do not attempt to submit to a closed opportunity.'],
+          avoidPrioritizing: ['Trying to apply after the deadline.'],
           stepByStepPlan: [
-            'Browse similar active opportunities instead.',
-            'Reuse any evidence or preparation you already built for the next matching deadline.',
+            'Look for similar opportunities that are still open.',
+            'Keep the evidence you prepared. It will help with your next application.',
           ],
         };
       case 'critical':
         return {
-          highestPriorityAction: 'Verify the eligibility requirements and gather your required documents today.',
+          highestPriorityAction: 'With only a day or two left, submit the strongest version of what you already have.',
           realisticallyAchievable: [
-            'Tailoring your existing materials to this specific opportunity',
-            'Submitting with a safety margin before the deadline',
+            `Tailoring your current ${submission} to this listing`,
+            'Submitting with a few hours to spare',
           ],
-          avoidPrioritizing: ['Starting a new course, certification, or large project', 'Learning a new skill from scratch'],
+          avoidPrioritizing: ['Starting a course, certification or new project', 'Learning a new skill from scratch'],
           stepByStepPlan: [
-            'Confirm you meet every stated eligibility requirement.',
-            'Gather all required documents now.',
-            `Tailor your existing ${submission} to this specific opportunity.`,
-            'Focus only on evidence you already have — do not start anything new.',
-            'Submit with at least a few hours of buffer before the deadline.',
+            'Read the eligibility section once more and confirm you qualify.',
+            'Collect every document the application asks for.',
+            `Edit your ${submission} so the most relevant work appears first.`,
+            'Submit at least a few hours before the deadline.',
           ],
         };
       case 'urgent':
         return {
-          highestPriorityAction: 'Prioritize the one or two highest-impact improvements you can realistically finish this week.',
-          realisticallyAchievable: ['A focused revision of your existing materials', 'One round of feedback before submitting'],
-          avoidPrioritizing: ['Committing to a new multi-week project', 'Rebuilding your portfolio from scratch'],
+          highestPriorityAction: 'You have about a week. Choose one or two improvements you can finish properly.',
+          realisticallyAchievable: ['One focused revision of your materials', 'One round of feedback before you submit'],
+          avoidPrioritizing: ['A new project that needs several weeks', 'Rebuilding your portfolio from scratch'],
           stepByStepPlan: [
-            'Identify the one or two most application-critical improvements.',
-            'Research the provider using publicly available information.',
-            `Tailor your ${submission} to this opportunity.`,
-            'Get fast feedback from a peer or mentor.',
-            'Submit a day or two early to leave a buffer.',
+            'Decide which one or two changes would most improve this application.',
+            'Read what the organization says about itself on its own website.',
+            `Update your ${submission} to reflect what this listing asks for.`,
+            'Ask a peer or mentor to review it quickly.',
+            'Submit a day or two early.',
           ],
         };
       case 'focused':
         return {
-          highestPriorityAction: 'Pick one relevant project or piece of evidence and strengthen it.',
-          realisticallyAchievable: ['Meaningfully improving one project or evidence item', 'A polished, tailored application'],
+          highestPriorityAction: 'You have a few weeks. Put your effort into one strong piece of evidence.',
+          realisticallyAchievable: ['Noticeably improving one project or example', 'A polished application written for this listing'],
           avoidPrioritizing: ['Trying to improve everything at once'],
           stepByStepPlan: [
-            'Choose the single improvement most relevant to this opportunity.',
-            'Strengthen that project or evidence item.',
-            `Prepare your ${submission} materials.`,
-            'Get feedback and revise.',
-            'Submit with a buffer before the deadline.',
+            'Pick the project or example that best fits this listing.',
+            'Improve it until it clearly shows the skills the listing asks for.',
+            `Prepare your ${submission} around that example.`,
+            'Get feedback, revise, and submit with time to spare.',
           ],
         };
       case 'roadmap':
         return {
-          highestPriorityAction: 'Build a weekly preparation roadmap targeting this opportunity.',
-          realisticallyAchievable: ['Closing one or two priority competency gaps', 'One to two new pieces of evidence'],
-          avoidPrioritizing: ['Spreading effort across too many unrelated skills'],
+          highestPriorityAction: 'You have around one to two months. Plan your preparation week by week.',
+          realisticallyAchievable: ['Closing one or two important skill gaps', 'One or two new pieces of evidence'],
+          avoidPrioritizing: ['Spreading your time across too many unrelated skills'],
           stepByStepPlan: [
-            'Build a weekly preparation roadmap.',
-            'Address the priority competency gaps for this opportunity type.',
-            'Build or improve one to two pieces of relevant evidence.',
-            'Research the opportunity and provider as you go.',
-            `Prepare your ${submission} materials in stages.`,
+            'Write down what you will work on each week until the deadline.',
+            'Start with the skill gaps that matter most for this kind of opportunity.',
+            'Build or improve one or two pieces of work that show those skills.',
+            'Learn about the organization as you go.',
+            `Draft your ${submission} in stages rather than all at the end.`,
           ],
         };
       case 'phased':
         return {
-          highestPriorityAction: 'Create a phased, monthly roadmap that builds priority skills before the deadline.',
-          realisticallyAchievable: ['Developing one or two priority skills with real evidence', 'A meaningfully stronger profile'],
-          avoidPrioritizing: ['Waiting until the final weeks to start preparing'],
+          highestPriorityAction: 'You have a few months. Split your preparation into monthly phases.',
+          realisticallyAchievable: ['One or two stronger skills backed by real work', 'A noticeably stronger profile'],
+          avoidPrioritizing: ['Leaving everything until the final weeks'],
           stepByStepPlan: [
-            'Create a phased, monthly preparation roadmap.',
-            'Develop the priority skills for this stage and opportunity type.',
-            'Build evidence that demonstrates those skills.',
-            'Strengthen your overall profile.',
-            `Prepare your ${submission} materials.`,
-            'Review and submit with time to spare.',
+            'Set a goal for each month between now and the deadline.',
+            'Develop the skills this kind of opportunity expects at your level.',
+            'Produce work that shows those skills in practice.',
+            `Prepare your ${submission} in the final month.`,
+            'Review everything and submit early.',
           ],
         };
       case 'longTerm':
         return {
-          highestPriorityAction: 'Start from foundations and build toward this opportunity in stages.',
-          realisticallyAchievable: ['A genuinely stronger skill set and portfolio by the deadline'],
-          avoidPrioritizing: ['Rushing to prepare materials months before they are needed'],
+          highestPriorityAction: 'The deadline is far away, so build your foundations before you write the application.',
+          realisticallyAchievable: ['A clearly stronger skill set and portfolio by the deadline'],
+          avoidPrioritizing: ['Writing application materials months before you need them'],
           stepByStepPlan: [
-            'Foundations: build the core skills this opportunity type expects.',
-            'Applied practice: use those skills on real or guided projects.',
-            'Evidence and impact: turn that practice into demonstrable outcomes.',
-            'Profile strengthening: fill in remaining gaps.',
-            `Application preparation: draft your ${submission}.`,
-            'Review and submission: revise and submit with a buffer.',
+            'Learn the core skills this kind of opportunity expects.',
+            'Practise them on real or guided projects.',
+            'Turn that practice into results you can point to.',
+            'Fill any gaps that remain in your profile.',
+            `Draft your ${submission} closer to the deadline, then revise and submit early.`,
           ],
         };
       case 'rolling':
         return {
-          highestPriorityAction: 'Use the open timeline to build real evidence rather than rushing an application.',
-          realisticallyAchievable: ['Steady, unhurried skill and portfolio building'],
-          avoidPrioritizing: ['Treating this as urgent when there is no stated deadline'],
+          highestPriorityAction: 'There is no fixed deadline, so build real evidence before you apply.',
+          realisticallyAchievable: ['Steady progress on your skills and portfolio'],
+          avoidPrioritizing: ['Rushing an application when there is no deadline pressure'],
           stepByStepPlan: [
-            'Build core skills and evidence relevant to this opportunity type at a sustainable pace.',
-            'Prepare your materials once you have solid evidence to show.',
-            'Check back periodically in case a deadline is later added.',
+            'Work on the skills and evidence this kind of opportunity needs at a pace you can keep up.',
+            `Prepare your ${submission} once you have solid work to show.`,
+            'Check the listing now and then in case a deadline is added.',
           ],
         };
     }

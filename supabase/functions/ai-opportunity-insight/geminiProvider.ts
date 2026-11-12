@@ -1,4 +1,10 @@
-import { GEMINI_CALL_TIMEOUT_MS, getGeminiModel } from './config.ts';
+import {
+  GEMINI_CALL_TIMEOUT_MS,
+  GEMINI_MIN_RETRY_MS,
+  GEMINI_TOTAL_BUDGET_MS,
+  getGeminiFallbackModel,
+  getGeminiModel,
+} from './config.ts';
 
 /**
  * Gemini's structured-output schema format (a restricted subset of
@@ -93,7 +99,13 @@ export interface AIProviderInput {
 
 export type AIProviderResult =
   | { ok: true; rawText: string }
-  | { ok: false; reason: 'timeout' | 'network_error' | 'provider_error' | 'missing_key'; safeMessage: string };
+  | {
+      ok: false;
+      reason: 'timeout' | 'network_error' | 'provider_error' | 'rate_limited' | 'missing_key';
+      safeMessage: string;
+      /** True only for quick failures worth one retry (provider 5xx, network). */
+      transient?: boolean;
+    };
 
 /**
  * Calls Gemini and returns the raw (unvalidated) JSON text it produced.
@@ -112,11 +124,29 @@ export async function callAIProvider(input: AIProviderInput): Promise<AIProvider
     return { ok: false, reason: 'missing_key', safeMessage: 'AI insight is not configured on this deployment.' };
   }
 
-  const model = getGeminiModel();
+  const startedAt = Date.now();
+  const first = await callGeminiOnce(apiKey, getGeminiModel(), GEMINI_CALL_TIMEOUT_MS, input);
+  if (first.ok) return first;
+
+  // At most one retry, and only for quick transient failures (provider 5xx
+  // or a network error). Never after a timeout (no time left), a rate limit
+  // (a retry makes it worse) or another 4xx (it would fail the same way).
+  const remaining = GEMINI_TOTAL_BUDGET_MS - (Date.now() - startedAt);
+  if (!first.transient || remaining < GEMINI_MIN_RETRY_MS) return first;
+  console.error(`AI insight: transient provider failure (${first.reason}); retrying once.`);
+  return callGeminiOnce(apiKey, getGeminiFallbackModel(), remaining, input);
+}
+
+async function callGeminiOnce(
+  apiKey: string,
+  model: string,
+  timeoutMs: number,
+  input: AIProviderInput,
+): Promise<AIProviderResult> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), GEMINI_CALL_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const res = await fetch(url, {
@@ -151,7 +181,20 @@ export async function callAIProvider(input: AIProviderInput): Promise<AIProvider
       // never log request/response bodies here (no API key in this body,
       // but keep the practice consistent).
       console.error(`AI insight: Gemini responded with HTTP ${res.status}.`);
-      return { ok: false, reason: 'provider_error', safeMessage: 'The AI provider returned an error.' };
+      try { await res.body?.cancel(); } catch { /* ignore */ }
+      if (res.status === 429) {
+        return {
+          ok: false,
+          reason: 'rate_limited',
+          safeMessage: 'AI insight is busy right now because of high demand. Please try again in a minute.',
+        };
+      }
+      return {
+        ok: false,
+        reason: 'provider_error',
+        safeMessage: 'The AI provider returned an error.',
+        transient: res.status >= 500,
+      };
     }
 
     const data = await res.json();
@@ -183,7 +226,7 @@ export async function callAIProvider(input: AIProviderInput): Promise<AIProvider
       return { ok: false, reason: 'timeout', safeMessage: 'The AI provider took too long to respond.' };
     }
     console.error('AI insight: network error calling Gemini.', err instanceof Error ? err.message : 'unknown error');
-    return { ok: false, reason: 'network_error', safeMessage: 'Could not reach the AI provider.' };
+    return { ok: false, reason: 'network_error', safeMessage: 'Could not reach the AI provider.', transient: true };
   } finally {
     clearTimeout(timeout);
   }

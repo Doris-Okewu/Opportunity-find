@@ -84,7 +84,7 @@ export default function AIInsightPanel({
         {status === 'loading' && (
           <div role="status" aria-live="polite" className="animate-reveal-fade flex items-center gap-2 text-sm text-ink-2">
             <Spinner className="h-4 w-4 text-ai" />
-            Generating AI preparation insight...
+            Generating AI preparation insight. This usually takes 5 to 20 seconds and can take up to a minute.
           </div>
         )}
 

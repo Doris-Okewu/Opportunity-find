@@ -75,23 +75,70 @@ function MatchRing({ percentage, strengthLabel, size }: { percentage: number | n
   );
 }
 
-export default function MatchScorePanel({ match, compact = false }: { match: MatchScoreResult; compact?: boolean }) {
+/** Shown instead of a percentage ring when a listing is outside the user's profile. */
+function NotAMatchIcon({ size }: { size: number }) {
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center rounded-full border-[6px] border-border text-ink-3"
+      style={{ width: size, height: size }}
+      aria-hidden="true"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-1/3 w-1/3">
+        <circle cx="11" cy="11" r="7" />
+        <path strokeLinecap="round" d="m20 20-3.5-3.5" />
+      </svg>
+    </span>
+  );
+}
+
+export default function MatchScorePanel({
+  match,
+  compact = false,
+  listingFields = [],
+}: {
+  match: MatchScoreResult;
+  compact?: boolean;
+  /** Career fields the listing is for, shown when it is not a personal match. */
+  listingFields?: string[];
+}) {
   const reasons = compact ? match.matchReasons.slice(0, 3) : match.matchReasons;
   const checks = compact ? match.thingsToCheck.slice(0, 2) : match.thingsToCheck;
+  const size = compact ? 56 : 80;
 
   return (
     <div>
       <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-center sm:gap-4 sm:text-left">
-        <MatchRing percentage={match.percentage} strengthLabel={match.strengthLabel} size={compact ? 56 : 80} />
+        {match.notPersonalMatch ? (
+          <NotAMatchIcon size={size} />
+        ) : (
+          <MatchRing percentage={match.percentage} strengthLabel={match.strengthLabel} size={size} />
+        )}
         <div className="min-w-0 w-full sm:w-auto sm:flex-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-3">Estimated Match</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-3">
+            {match.notPersonalMatch ? 'Match status' : 'Estimated Match'}
+          </p>
           {match.notPersonalMatch ? (
-            <Badge tone="default">Not a personal match</Badge>
+            <Badge tone="default">Not one of your matches</Badge>
           ) : (
             <Badge tone={STRENGTH_TONE[match.strengthLabel]}>{match.strengthLabel}</Badge>
           )}
         </div>
       </div>
+
+      {match.notPersonalMatch && !compact && (
+        <div className="mt-3 rounded-lg bg-surface-2 p-3">
+          <p className="mb-1 text-xs font-semibold text-ink-2">Why you can still see this</p>
+          <p className="text-sm text-ink-2">
+            Browse lists every open opportunity on Opportunity Find, not only your matches, so you can explore beyond
+            your chosen path. Listings that do not fit your profile get no match score and are left out of My Matches.
+          </p>
+          {listingFields.length > 0 && (
+            <p className="mt-2 text-sm text-ink-2">
+              <span className="font-semibold">This listing is for:</span> {listingFields.join(', ')}
+            </p>
+          )}
+        </div>
+      )}
 
       {reasons.length > 0 && (
         <div className="mt-3">
@@ -121,9 +168,13 @@ export default function MatchScorePanel({ match, compact = false }: { match: Mat
         </div>
       )}
 
-      {!compact && match.unassessedNote && <p className="mt-3 text-xs text-ink-3">{match.unassessedNote}</p>}
+      {/* For a non-match the explanation above already covers this note. */}
+      {!compact && match.unassessedNote && !match.notPersonalMatch && (
+        <p className="mt-3 text-xs text-ink-3">{match.unassessedNote}</p>
+      )}
 
-      {!compact && <p className="mt-3 text-xs italic text-ink-3">{match.disclaimer}</p>}
+      {/* The disclaimer explains the estimate, so it only applies when one is shown. */}
+      {!compact && !match.notPersonalMatch && <p className="mt-3 text-xs italic text-ink-3">{match.disclaimer}</p>}
     </div>
   );
 }

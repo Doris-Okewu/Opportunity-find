@@ -1,4 +1,13 @@
-export default function NextBestActionCallout({ action }: { action: string }) {
+import { Link } from 'react-router-dom';
+import Button from '../ui/Button';
+
+export interface NextBestActionLink {
+  label: string;
+  to: string;
+  variant?: 'primary' | 'secondary';
+}
+
+export default function NextBestActionCallout({ action, links = [] }: { action: string; links?: NextBestActionLink[] }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-brand/25 bg-brand/5 p-4">
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-white">
@@ -9,6 +18,15 @@ export default function NextBestActionCallout({ action }: { action: string }) {
       <div className="min-w-0 flex-1">
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-brand">Next Best Action</p>
         <p className="whitespace-normal break-normal text-sm font-medium text-ink">{action}</p>
+        {links.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {links.map((link) => (
+              <Link key={link.to} to={link.to}>
+                <Button variant={link.variant ?? 'primary'}>{link.label}</Button>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

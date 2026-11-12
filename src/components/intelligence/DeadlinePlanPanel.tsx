@@ -72,7 +72,8 @@ export default function DeadlinePlanPanel({ plan }: { plan: DeadlinePlan }) {
                 ? 'Deadline has passed'
                 : `${plan.daysRemaining} day${plan.daysRemaining === 1 ? '' : 's'} remaining`}
           </p>
-          <Badge tone={BAND_TONE[plan.band]}>{plan.urgencyLabel}</Badge>
+          {/* The rolling band's label repeats the heading above, so skip it. */}
+          {plan.band !== 'rolling' && <Badge tone={BAND_TONE[plan.band]}>{plan.urgencyLabel}</Badge>}
         </div>
       </div>
 

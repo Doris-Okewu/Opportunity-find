@@ -174,7 +174,7 @@ export default function OpportunityDetailPage() {
           <div className="rounded-2xl border border-border bg-surface-2 p-6">
             <SectionHeading>Your Match</SectionHeading>
             <Card>
-              <MatchScorePanel match={intelligence.match} />
+              <MatchScorePanel match={intelligence.match} listingFields={careerPathLabels} />
             </Card>
           </div>
         )}
@@ -209,7 +209,17 @@ export default function OpportunityDetailPage() {
           <div className="rounded-2xl border border-border bg-surface-2 p-6">
             <SectionHeading>Preparation and Deadline Plan</SectionHeading>
             <div className="space-y-4">
-              <NextBestActionCallout action={intelligence.nextBestAction} />
+              <NextBestActionCallout
+                action={intelligence.nextBestAction}
+                links={
+                  intelligence.match.notPersonalMatch
+                    ? [
+                        { label: 'See My Matches', to: '/recommendations' },
+                        { label: 'Back to Browse', to: '/opportunities', variant: 'secondary' },
+                      ]
+                    : []
+                }
+              />
               <Accordion title="Deadline-Aware Action Plan" defaultOpen>
                 <DeadlinePlanPanel plan={intelligence.deadlinePlan} />
               </Accordion>

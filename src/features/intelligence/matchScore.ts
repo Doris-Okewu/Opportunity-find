@@ -52,7 +52,7 @@ export function calculateMatchScore(profile: OnboardingProfile, opportunity: Opp
     dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: 35 });
   } else {
     dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: 20 });
-    thingsToCheck.push('Listed for a related field rather than your exact path — check the requirements carefully.');
+    thingsToCheck.push('Listed for a related field rather than your exact path, so read the requirements carefully.');
   }
   if (eligibility.careerReason) matchReasons.push(eligibility.careerReason);
 
@@ -67,10 +67,10 @@ export function calculateMatchScore(profile: OnboardingProfile, opportunity: Opp
     matchReasons.push('Suitable for your selected experience level.');
   } else if (gap === 1) {
     dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 12 });
-    thingsToCheck.push('This listing targets one level above your selected experience — a stretch, so check the requirements.');
+    thingsToCheck.push('This listing targets one level above your selected experience. It is a stretch, so check the requirements.');
   } else if (gap === -1) {
     dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 15 });
-    thingsToCheck.push('This listing targets a level below your selected experience — it may be less of a step forward.');
+    thingsToCheck.push('This listing targets a level below your selected experience, so it may be less of a step forward.');
   } else {
     dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 0 });
     thingsToCheck.push('This listing targets a much less experienced level than the one you selected.');
@@ -82,7 +82,7 @@ export function calculateMatchScore(profile: OnboardingProfile, opportunity: Opp
     matchReasons.push(`${OPPORTUNITY_TYPE_LABELS[opportunity.type]} is one of your preferred opportunity types.`);
   } else {
     dimensions.push({ key: 'opportunityType', label: 'Opportunity-type alignment', maxPoints: 20, earnedPoints: 0 });
-    thingsToCheck.push("This isn't one of the opportunity types you selected — confirm it's still something you want.");
+    thingsToCheck.push("This isn't one of the opportunity types you selected. Confirm it is still something you want.");
   }
 
   // Remote / on-site preference — 10 points.
@@ -110,7 +110,7 @@ export function calculateMatchScore(profile: OnboardingProfile, opportunity: Opp
     matchReasons.push('Location aligns with your preference.');
   } else {
     dimensions.push({ key: 'location', label: 'Location alignment', maxPoints: 10, earnedPoints: 0 });
-    thingsToCheck.push('The listed location differs from your preference — check if remote work or relocation is possible.');
+    thingsToCheck.push('The listed location differs from your preference. Check whether remote work or relocation is possible.');
   }
 
   const assessedDimensions = dimensions.filter((d) => d.earnedPoints !== null);
