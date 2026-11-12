@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import ProgressBar from '../components/onboarding/ProgressBar';
 import OptionButton from '../components/onboarding/OptionButton';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { useOnboardingProfile } from '../hooks/useOnboardingProfile';
-import { CAREER_PATHS } from '../features/careerEngine/careerPaths';
+import { CAREER_PATH_GROUPS } from '../features/careerEngine/careerPaths';
+import { trackSiteEvent } from '../features/tracking/trackSiteEvent';
 import { APPLICANT_STATUS_LABELS } from '../features/careerEngine/types';
 import type { ApplicantStatus, OnboardingProfile, RemotePreference } from '../features/careerEngine/types';
 import { OPPORTUNITY_TYPE_LABELS, EXPERIENCE_LEVEL_LABELS } from '../types/opportunity';
@@ -17,9 +18,14 @@ type Draft = Partial<OnboardingProfile>;
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { saveProfile } = useOnboardingProfile();
+  const [params] = useSearchParams();
+  const isEdit = params.get('edit') === '1';
+  const { profile, saveProfile } = useOnboardingProfile();
   const [step, setStep] = useState(1);
-  const [draft, setDraft] = useState<Draft>({ preferredTypes: [], remotePreference: 'any', location: '' });
+  // Editing starts from the saved preferences, never from empty defaults.
+  const [draft, setDraft] = useState<Draft>(() =>
+    isEdit && profile ? { ...profile } : { preferredTypes: [], remotePreference: 'any', location: '' },
+  );
 
   const canGoNext =
     (step === 1 && !!draft.status) ||
@@ -45,16 +51,25 @@ export default function OnboardingPage() {
       remotePreference: draft.remotePreference ?? 'any',
       location: draft.location ?? '',
     };
+    trackSiteEvent(isEdit ? 'preferences_updated' : 'onboarding_complete', {
+      detail: `${profile.careerPath}:${profile.experienceLevel}`,
+    });
     saveProfile(profile);
     navigate('/recommendations');
   }
 
+  // Returning users who already completed onboarding go straight to their
+  // matches; preferences are changed deliberately via ?edit=1.
+  if (profile && !isEdit) return <Navigate to="/recommendations" replace />;
+
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-ink">Find My Path</h1>
+        <h1 className="text-2xl font-bold text-ink">{isEdit ? 'Edit your preferences' : 'Find My Path'}</h1>
         <p className="mt-1 text-ink-2">
-          Answer a few quick questions to get personalized recommendations.
+          {isEdit
+            ? 'Update your answers — your personalised recommendations will change to match.'
+            : 'Answer a few quick questions to get personalized recommendations.'}
         </p>
       </div>
 
@@ -83,14 +98,19 @@ export default function OnboardingPage() {
           <legend className="mb-3 text-lg font-semibold text-ink">
             Which career path interests you most?
           </legend>
-          {CAREER_PATHS.map((path) => (
-            <OptionButton
-              key={path.slug}
-              selected={draft.careerPath === path.slug}
-              onClick={() => setDraft((prev) => ({ ...prev, careerPath: path.slug }))}
-              title={path.label}
-              description={path.description}
-            />
+          {CAREER_PATH_GROUPS.map((group) => (
+            <div key={group.category} className="space-y-3 pt-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-3">{group.label}</h3>
+              {group.paths.map((path) => (
+                <OptionButton
+                  key={path.slug}
+                  selected={draft.careerPath === path.slug}
+                  onClick={() => setDraft((prev) => ({ ...prev, careerPath: path.slug }))}
+                  title={path.label}
+                  description={path.description}
+                />
+              ))}
+            </div>
           ))}
         </fieldset>
       )}

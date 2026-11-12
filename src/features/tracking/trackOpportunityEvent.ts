@@ -22,7 +22,7 @@ function generateId(): string {
 
 let memoryVisitorId: string | null = null;
 
-function getVisitorId(): string {
+export function getVisitorId(): string {
   try {
     const existing = localStorage.getItem(VISITOR_ID_STORAGE_KEY);
     if (existing) return existing;

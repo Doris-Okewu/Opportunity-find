@@ -71,7 +71,7 @@ const CATEGORY_LEVEL_TEMPLATES: Record<CompetencyKey, Record<ExperienceLevel, st
 
 // Which categories matter most for each career path, and in what order —
 // this is what varies "the exact emphasis" per path (feature 4).
-const CAREER_COMPETENCY_EMPHASIS: Record<CareerPathSlug, CompetencyKey[]> = {
+const CAREER_COMPETENCY_EMPHASIS: Partial<Record<CareerPathSlug, CompetencyKey[]>> = {
   frontend: ['technical', 'collaboration', 'communication', 'professional', 'portfolio', 'leadership'],
   backend: ['technical', 'problemSolving', 'domain', 'collaboration', 'professional', 'leadership'],
   data: ['technical', 'problemSolving', 'communication', 'domain', 'portfolio', 'leadership'],
@@ -80,7 +80,14 @@ const CAREER_COMPETENCY_EMPHASIS: Record<CareerPathSlug, CompetencyKey[]> = {
   marketing: ['communication', 'problemSolving', 'domain', 'portfolio', 'collaboration', 'leadership'],
   cybersecurity: ['technical', 'problemSolving', 'communication', 'professional', 'domain', 'leadership'],
   devops: ['technical', 'problemSolving', 'collaboration', 'domain', 'professional', 'leadership'],
+  'product-design': ['communication', 'problemSolving', 'collaboration', 'portfolio', 'domain', 'leadership'],
+  'technical-writing': ['communication', 'domain', 'collaboration', 'portfolio', 'professional', 'leadership'],
+  'it-support': ['technical', 'communication', 'problemSolving', 'professional', 'collaboration', 'leadership'],
+  qa: ['technical', 'problemSolving', 'communication', 'collaboration', 'professional', 'leadership'],
 };
+
+// Used for technical paths without a specific emphasis above.
+const DEFAULT_TECHNICAL_EMPHASIS: CompetencyKey[] = ['technical', 'problemSolving', 'collaboration', 'portfolio', 'professional', 'leadership'];
 
 /**
  * Broader-than-technical competencies to strengthen for a career path and
@@ -92,7 +99,7 @@ export function getCompetencyFramework(slug: CareerPathSlug, level: ExperienceLe
   const careerPath = getCareerPath(slug);
   if (!careerPath) return undefined;
 
-  return CAREER_COMPETENCY_EMPHASIS[slug].map((key) => ({
+  return (CAREER_COMPETENCY_EMPHASIS[slug] ?? DEFAULT_TECHNICAL_EMPHASIS).map((key) => ({
     key,
     label: CATEGORY_LABELS[key],
     focus: CATEGORY_LEVEL_TEMPLATES[key][level].replace('{career}', careerPath.label),

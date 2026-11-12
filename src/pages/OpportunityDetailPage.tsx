@@ -30,6 +30,7 @@ import SkillLadderPanel from '../components/intelligence/SkillLadderPanel';
 import CompetencyList from '../components/intelligence/CompetencyList';
 import OpportunityDiscussion from '../components/community/OpportunityDiscussion';
 import { trackOpportunityEvent } from '../features/tracking/trackOpportunityEvent';
+import { trackSiteEvent } from '../features/tracking/trackSiteEvent';
 import {
   APPLICATION_STATUSES,
   APPLICATION_STATUS_LABELS,
@@ -135,7 +136,7 @@ export default function OpportunityDetailPage() {
   const current = opportunity;
   function handleApplyOpened() {
     // Never preventDefault / await: the browser opens the link immediately.
-    recordApplyOpened(current);
+    if (recordApplyOpened(current)) trackSiteEvent('tracker_add', { opportunityId: current.id });
     trackOpportunityEvent(current.id, 'apply_click');
   }
 
@@ -319,7 +320,11 @@ export default function OpportunityDetailPage() {
                 <Select
                   id="application-status"
                   value={application.status}
-                  onChange={(e) => updateApplication(application.opportunityId, { status: e.target.value as ApplicationStatus })}
+                  onChange={(e) => {
+                    const status = e.target.value as ApplicationStatus;
+                    updateApplication(application.opportunityId, { status });
+                    trackSiteEvent('tracker_status_change', { detail: status });
+                  }}
                 >
                   {APPLICATION_STATUSES.map((s) => (
                     <option key={s} value={s}>
@@ -329,7 +334,13 @@ export default function OpportunityDetailPage() {
                 </Select>
               </div>
               {application.status === 'opened' && (
-                <Button variant="secondary" onClick={() => updateApplication(application.opportunityId, { status: 'applied' })}>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    updateApplication(application.opportunityId, { status: 'applied' });
+                    trackSiteEvent('tracker_status_change', { detail: 'applied' });
+                  }}
+                >
                   Yes, I applied
                 </Button>
               )}

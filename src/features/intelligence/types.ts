@@ -14,6 +14,8 @@ export interface MatchScoreResult {
   /** 0-100, or null if not enough information existed to assess any dimension. */
   percentage: number | null;
   strengthLabel: MatchStrength;
+  /** True when the opportunity is outside the user's career path / experience range — no score is given. */
+  notPersonalMatch?: boolean;
   dimensions: MatchDimension[];
   matchReasons: string[];
   thingsToCheck: string[];

@@ -86,8 +86,11 @@ export interface OpportunitySnapshot {
   deadline: string | null;
 }
 
-/** Records that the Apply link was opened. Never downgrades an existing status. */
-export function recordApplyOpened(opportunity: OpportunitySnapshot): void {
+/**
+ * Records that the Apply link was opened. Never downgrades an existing status.
+ * Returns true when a new tracker entry was created.
+ */
+export function recordApplyOpened(opportunity: OpportunitySnapshot): boolean {
   const now = new Date().toISOString();
   const records = readApplications();
   const existing = records.find((r) => r.opportunityId === opportunity.id);
@@ -98,7 +101,7 @@ export function recordApplyOpened(opportunity: OpportunitySnapshot): void {
     existing.applicationUrl = opportunity.application_url;
     existing.deadline = opportunity.deadline;
     writeApplications(records);
-    return;
+    return false;
   }
   writeApplications([
     {
@@ -114,6 +117,7 @@ export function recordApplyOpened(opportunity: OpportunitySnapshot): void {
     },
     ...records,
   ]);
+  return true;
 }
 
 export function updateApplication(

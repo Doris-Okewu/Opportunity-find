@@ -6,6 +6,7 @@ import Badge from '../../components/ui/Badge';
 import Select from '../../components/ui/Select';
 import Spinner from '../../components/ui/Spinner';
 import ErrorState from '../../components/opportunities/ErrorState';
+import EngagementPanel from '../../components/admin/EngagementPanel';
 
 const RANGES = [7, 30, 90] as const;
 
@@ -82,8 +83,8 @@ export default function AdminAnalyticsPage() {
         <div>
           <h1 className="text-2xl font-bold text-ink">Analytics</h1>
           <p className="mt-1 text-sm text-ink-2">
-            Anonymous, aggregate counts only. Apply clicks mean the official link was opened — not that an application
-            was submitted.
+            Aggregate counts only — no individual visitors, emails or notes. Apply clicks mean the official link was
+            opened, not that an application was submitted.
           </p>
         </div>
         <div className="w-40">
@@ -99,6 +100,13 @@ export default function AdminAnalyticsPage() {
           </Select>
         </div>
       </div>
+
+      <section className="mb-10">
+        <h2 className="mb-3 text-lg font-semibold text-ink">Pilot engagement</h2>
+        <EngagementPanel days={days} />
+      </section>
+
+      <h2 className="mb-3 text-lg font-semibold text-ink">Opportunity performance</h2>
 
       {error && (
         <div className="space-y-3">

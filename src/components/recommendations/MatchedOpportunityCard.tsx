@@ -9,13 +9,16 @@ import MatchScorePanel from '../intelligence/MatchScorePanel';
 export default function MatchedOpportunityCard({
   opportunity,
   match,
+  onClick,
 }: {
   opportunity: Opportunity;
   match: MatchScoreResult;
+  onClick?: () => void;
 }) {
   return (
     <Link
       to={`/opportunities/${opportunity.id}`}
+      onClick={onClick}
       className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md"
     >
       <div className="flex items-center justify-between gap-2">

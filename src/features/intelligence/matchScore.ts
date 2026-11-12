@@ -1,5 +1,5 @@
 import { OPPORTUNITY_TYPE_LABELS, type Opportunity } from '../../types/opportunity';
-import { getCareerPath } from '../careerEngine/careerPaths';
+import { experienceGap, getEligibility, relevantSkills } from '../careerEngine/careerMatch';
 import type { OnboardingProfile } from '../careerEngine/types';
 import type { MatchDimension, MatchScoreResult, MatchStrength } from './types';
 
@@ -29,34 +29,51 @@ export function calculateMatchScore(profile: OnboardingProfile, opportunity: Opp
   const thingsToCheck: string[] = [];
   const dimensions: MatchDimension[] = [];
 
-  // Career-path alignment — 35 points.
-  const careerPathLabel = getCareerPath(profile.careerPath)?.label ?? profile.careerPath;
-  if (opportunity.career_tags.length === 0) {
-    dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: null });
-    thingsToCheck.push('This listing does not specify a career path — verify it actually fits Frontend/Backend/etc. before relying on this alone.');
-  } else if (opportunity.career_tags.includes(profile.careerPath)) {
-    dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: 35 });
-    matchReasons.push(`Matches your ${careerPathLabel} path.`);
-  } else {
-    dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: 0 });
-    thingsToCheck.push(`This listing is tagged for a different career path than ${careerPathLabel} — check whether it still applies to you.`);
+  // Career path is a hard gate, checked before anything is scored: an
+  // opportunity outside the user's path (or a closely related one), or one
+  // that clearly requires far more experience, gets NO percentage at all —
+  // matching secondary preferences must never produce a misleading score.
+  const eligibility = getEligibility(profile, opportunity);
+  if (!eligibility.eligible) {
+    return {
+      percentage: null,
+      strengthLabel: 'Explore',
+      notPersonalMatch: true,
+      dimensions: [],
+      matchReasons: [],
+      thingsToCheck: [eligibility.exclusionReason ?? 'Not a match for your profile.'],
+      unassessedNote: 'Not a personalised match, so no match score is shown. You can still explore it.',
+      disclaimer: DISCLAIMER,
+    };
   }
 
-  // Experience-level compatibility — 25 points. Adjacent levels get partial
-  // credit rather than being treated as a full mismatch.
-  const LEVEL_ORDER = ['student', 'entry', 'intermediate', 'senior'] as const;
-  const profileLevelIndex = LEVEL_ORDER.indexOf(profile.experienceLevel);
-  const oppLevelIndex = LEVEL_ORDER.indexOf(opportunity.experience_level);
-  const levelDistance = Math.abs(profileLevelIndex - oppLevelIndex);
-  if (levelDistance === 0) {
+  // Career-path alignment — 35 points (direct) or 20 (closely related field).
+  if (eligibility.careerFit.kind === 'direct') {
+    dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: 35 });
+  } else {
+    dimensions.push({ key: 'careerPath', label: 'Career path alignment', maxPoints: 35, earnedPoints: 20 });
+    thingsToCheck.push('Listed for a related field rather than your exact path — check the requirements carefully.');
+  }
+  if (eligibility.careerReason) matchReasons.push(eligibility.careerReason);
+
+  const skills = relevantSkills(profile.careerPath, opportunity);
+  if (skills.length > 0) matchReasons.push(`Asks for skills in your path: ${skills.slice(0, 3).join(', ')}.`);
+
+  // Experience-level compatibility — 25 points. One level above the user is
+  // a stretch (partial credit); two or more above is excluded by the gate.
+  const gap = experienceGap(profile.experienceLevel, opportunity.experience_level);
+  if (gap === 0) {
     dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 25 });
     matchReasons.push('Suitable for your selected experience level.');
-  } else if (levelDistance === 1) {
+  } else if (gap === 1) {
     dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 12 });
-    thingsToCheck.push('This listing targets a neighboring experience level — check whether the requirements are still a realistic fit.');
+    thingsToCheck.push('This listing targets one level above your selected experience — a stretch, so check the requirements.');
+  } else if (gap === -1) {
+    dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 15 });
+    thingsToCheck.push('This listing targets a level below your selected experience — it may be less of a step forward.');
   } else {
     dimensions.push({ key: 'experienceLevel', label: 'Experience-level compatibility', maxPoints: 25, earnedPoints: 0 });
-    thingsToCheck.push('This listing targets a notably different experience level than the one you selected.');
+    thingsToCheck.push('This listing targets a much less experienced level than the one you selected.');
   }
 
   // Selected opportunity-type alignment — 20 points.

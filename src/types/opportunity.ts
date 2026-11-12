@@ -8,7 +8,15 @@ export type OpportunityType =
   | 'competition'
   | 'tech_program';
 
+// Stored values are fixed by the opportunities.experience_level check
+// constraint and by saved onboarding profiles, so they are kept as-is and only
+// the user-facing labels changed: 'student' is shown as "Beginner" and
+// 'senior' as "Advanced". Educational status (student, NYSC, graduate…) is a
+// separate field — see ApplicantStatus in features/careerEngine/types.ts.
 export type ExperienceLevel = 'student' | 'entry' | 'intermediate' | 'senior';
+
+/** Ordered from least to most experienced. */
+export const EXPERIENCE_LEVEL_ORDER: ExperienceLevel[] = ['student', 'entry', 'intermediate', 'senior'];
 
 export interface Opportunity {
   id: string;
@@ -42,8 +50,8 @@ export const OPPORTUNITY_TYPE_LABELS: Record<OpportunityType, string> = {
 };
 
 export const EXPERIENCE_LEVEL_LABELS: Record<ExperienceLevel, string> = {
-  student: 'Student',
+  student: 'Beginner',
   entry: 'Entry Level',
   intermediate: 'Intermediate',
-  senior: 'Senior',
+  senior: 'Advanced',
 };

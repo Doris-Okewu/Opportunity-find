@@ -15,6 +15,7 @@ import Select from '../components/ui/Select';
 import Textarea from '../components/ui/Textarea';
 import EmptyState from '../components/opportunities/EmptyState';
 import DeadlineBadge from '../components/opportunities/DeadlineBadge';
+import { trackSiteEvent } from '../features/tracking/trackSiteEvent';
 
 type Filter = 'all' | ApplicationStatus;
 
@@ -66,7 +67,11 @@ function ApplicationRow({ record }: { record: ApplicationRecord }) {
           <Select
             id={statusId}
             value={record.status}
-            onChange={(e) => updateApplication(record.opportunityId, { status: e.target.value as ApplicationStatus })}
+            onChange={(e) => {
+              const status = e.target.value as ApplicationStatus;
+              updateApplication(record.opportunityId, { status });
+              trackSiteEvent('tracker_status_change', { detail: status });
+            }}
           >
             {APPLICATION_STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -76,9 +81,12 @@ function ApplicationRow({ record }: { record: ApplicationRecord }) {
           </Select>
         </div>
         <div>
-          <label htmlFor={notesId} className="mb-1 block text-xs font-semibold text-ink-2">
-            Notes (private, this browser only)
+          <label htmlFor={notesId} className="block text-xs font-semibold text-ink-2">
+            Private notes
           </label>
+          <p id={`${notesId}-help`} className="mb-1 text-xs text-ink-3">
+            Only saved on this device. Keep track of your application activities and follow-ups.
+          </p>
           <Textarea
             id={notesId}
             rows={2}
@@ -88,7 +96,8 @@ function ApplicationRow({ record }: { record: ApplicationRecord }) {
             onBlur={() => {
               if (notes !== record.notes) updateApplication(record.opportunityId, { notes });
             }}
-            placeholder="e.g. Submitted CV v3, follow up on 20 Nov"
+            aria-describedby={`${notesId}-help`}
+            placeholder="e.g. Submitted CV, interview scheduled, follow up next week."
           />
         </div>
       </div>

@@ -9,6 +9,41 @@ import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Spinner from '../components/ui/Spinner';
 import { FormError } from '../components/community/communityUi';
+import { trackSiteEvent } from '../features/tracking/trackSiteEvent';
+import { useOnboardingProfile } from '../hooks/useOnboardingProfile';
+import { getCareerPath } from '../features/careerEngine/careerPaths';
+import { EXPERIENCE_LEVEL_LABELS } from '../types/opportunity';
+
+/** Career preferences are stored in this browser and editable at any time. */
+function PreferencesCard() {
+  const { profile } = useOnboardingProfile();
+  return (
+    <Card className="mt-6 space-y-3">
+      <h2 className="text-lg font-semibold text-ink">Career preferences</h2>
+      {profile ? (
+        <>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+            <dt className="text-ink-3">Career path</dt>
+            <dd className="text-ink">{getCareerPath(profile.careerPath)?.label ?? profile.careerPath}</dd>
+            <dt className="text-ink-3">Experience</dt>
+            <dd className="text-ink">{EXPERIENCE_LEVEL_LABELS[profile.experienceLevel]}</dd>
+          </dl>
+          <p className="text-xs text-ink-3">Saved on this device. Changing them updates your personalised recommendations.</p>
+          <Link to="/onboarding?edit=1">
+            <Button variant="secondary">Edit preferences</Button>
+          </Link>
+        </>
+      ) : (
+        <>
+          <p className="text-sm text-ink-2">You haven't set your career path yet.</p>
+          <Link to="/onboarding">
+            <Button variant="secondary">Find my path</Button>
+          </Link>
+        </>
+      )}
+    </Card>
+  );
+}
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -39,11 +74,12 @@ function AuthForm({ next }: { next: string }) {
       if (mode === 'signin') {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
         if (err) throw new Error('Invalid email or password, or your email is not confirmed yet.');
+        trackSiteEvent('sign_in');
       } else {
         const { data, error: err } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/account?next=${encodeURIComponent(next)}` },
+          options: { emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}` },
         });
         if (err) throw new Error(err.message);
         if (!data.session) {
@@ -208,6 +244,7 @@ export default function AccountPage() {
           </div>
         </Card>
       )}
+      <PreferencesCard />
     </div>
   );
 }

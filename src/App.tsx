@@ -19,6 +19,7 @@ const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
 const RecommendationsPage = lazy(() => import('./pages/RecommendationsPage'));
 const MyApplicationsPage = lazy(() => import('./pages/MyApplicationsPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
+const AuthConfirmPage = lazy(() => import('./pages/AuthConfirmPage'));
 const CommunitiesPage = lazy(() => import('./pages/CommunitiesPage'));
 const CommunityPage = lazy(() => import('./pages/CommunityPage'));
 const CommunityPostPage = lazy(() => import('./pages/CommunityPostPage'));
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="recommendations" element={<RecommendationsPage />} />
             <Route path="applications" element={<MyApplicationsPage />} />
             <Route path="account" element={<AccountPage />} />
+            <Route path="auth/confirm" element={<AuthConfirmPage />} />
             <Route path="community" element={<CommunitiesPage />} />
             <Route path="community/posts/:id" element={<CommunityPostPage />} />
             <Route path="community/:slug" element={<CommunityPage />} />

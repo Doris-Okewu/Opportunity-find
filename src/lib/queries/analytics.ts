@@ -92,3 +92,59 @@ export async function getAdminAnalytics(days: number): Promise<AdminAnalytics> {
     })),
   };
 }
+
+// ── Pilot engagement (site_events + authoritative DB counts) ──────────────
+// See supabase/migrations/20261113000000_site_events.sql. Admin-only.
+
+export type EngagementSummary = Record<string, number>;
+
+export interface EngagementDailyRow {
+  day: string;
+  feature: string;
+  events: number;
+  unique_visitors: number;
+}
+
+export interface EngagementBreakdownRow {
+  event_type: string;
+  detail: string;
+  events: number;
+  unique_visitors: number;
+}
+
+export interface AdminEngagement {
+  summary: EngagementSummary;
+  daily: EngagementDailyRow[];
+  breakdown: EngagementBreakdownRow[];
+}
+
+export async function getAdminEngagement(days: number): Promise<AdminEngagement> {
+  const args = { p_days: days };
+  const [summaryRes, dailyRes, breakdownRes] = await Promise.all([
+    supabase.rpc('admin_engagement_summary', args),
+    supabase.rpc('admin_engagement_daily', args),
+    supabase.rpc('admin_engagement_breakdown', args),
+  ]);
+  if (summaryRes.error) rethrow(summaryRes.error);
+  if (dailyRes.error) rethrow(dailyRes.error);
+  if (breakdownRes.error) rethrow(breakdownRes.error);
+
+  const summary: EngagementSummary = {};
+  for (const r of (summaryRes.data ?? []) as Record<string, unknown>[]) summary[String(r.metric)] = n(r.value);
+
+  return {
+    summary,
+    daily: ((dailyRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
+      day: String(r.day),
+      feature: String(r.feature),
+      events: n(r.events),
+      unique_visitors: n(r.unique_visitors),
+    })),
+    breakdown: ((breakdownRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
+      event_type: String(r.event_type),
+      detail: String(r.detail ?? ''),
+      events: n(r.events),
+      unique_visitors: n(r.unique_visitors),
+    })),
+  };
+}

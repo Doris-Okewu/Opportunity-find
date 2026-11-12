@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useOpportunities } from '../hooks/useOpportunities';
 import FilterBar from '../components/opportunities/FilterBar';
 import { DEFAULT_FILTERS } from '../components/opportunities/filters';
+import type { OpportunityFilters } from '../components/opportunities/filters';
+import { trackSiteEvent } from '../features/tracking/trackSiteEvent';
 import OpportunityCard from '../components/opportunities/OpportunityCard';
 import SkeletonCard from '../components/opportunities/SkeletonCard';
 import EmptyState from '../components/opportunities/EmptyState';
@@ -10,7 +12,27 @@ import Button from '../components/ui/Button';
 
 export default function OpportunitiesPage() {
   const { opportunities, loading, error, refetch } = useOpportunities();
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [filters, setFiltersState] = useState(DEFAULT_FILTERS);
+
+  // Analytics: record that a filter changed (key:value codes only) and that a
+  // search was made — the search text itself is never sent.
+  function setFilters(next: OpportunityFilters) {
+    (['type', 'careerTag', 'experienceLevel', 'remote'] as const).forEach((key) => {
+      if (next[key] !== filters[key]) trackSiteEvent('filter_change', { detail: `${key}:${next[key]}` });
+    });
+    setFiltersState(next);
+  }
+
+  const lastTrackedSearch = useRef('');
+  useEffect(() => {
+    const q = filters.search.trim().toLowerCase();
+    if (q.length < 2 || q === lastTrackedSearch.current) return;
+    const t = window.setTimeout(() => {
+      lastTrackedSearch.current = q;
+      trackSiteEvent('search');
+    }, 1500);
+    return () => window.clearTimeout(t);
+  }, [filters.search]);
 
   const filtered = useMemo(() => {
     const search = filters.search.trim().toLowerCase();
@@ -36,6 +58,9 @@ export default function OpportunitiesPage() {
         <p className="mt-1 text-ink-2">
           Jobs, internships, scholarships, fellowships, grants, competitions, tech programs, and NYSC placements —
           every listing verified before it goes live.
+        </p>
+        <p className="mt-1 text-sm text-ink-3">
+          General discovery: this shows every opportunity, not just matches for your career path.
         </p>
       </div>
 

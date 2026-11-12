@@ -1,7 +1,7 @@
 import Select from '../ui/Select';
 import TextInput from '../ui/Input';
 import Button from '../ui/Button';
-import { CAREER_PATHS } from '../../features/careerEngine/careerPaths';
+import { CAREER_PATH_GROUPS } from '../../features/careerEngine/careerPaths';
 import { OPPORTUNITY_TYPE_LABELS, EXPERIENCE_LEVEL_LABELS } from '../../types/opportunity';
 import { DEFAULT_FILTERS, type OpportunityFilters } from './filters';
 
@@ -51,10 +51,14 @@ export default function FilterBar({
           aria-label="Filter by career path"
         >
           <option value="all">All career paths</option>
-          {CAREER_PATHS.map((path) => (
-            <option key={path.slug} value={path.slug}>
-              {path.label}
-            </option>
+          {CAREER_PATH_GROUPS.map((group) => (
+            <optgroup key={group.category} label={group.label}>
+              {group.paths.map((path) => (
+                <option key={path.slug} value={path.slug}>
+                  {path.label}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </Select>
 

@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
+import { useOnboardingProfile } from '../../hooks/useOnboardingProfile';
 
-const NAV_LINKS = [
-  { to: '/opportunities', label: 'Browse' },
-  { to: '/onboarding', label: 'Find My Path' },
-  { to: '/community', label: 'Community' },
-  { to: '/applications', label: 'My Applications' },
-  { to: '/account', label: 'Account' },
-];
+function navLinks(hasProfile: boolean) {
+  return [
+    { to: '/opportunities', label: 'Browse' },
+    // Returning users go straight to their saved matches, not onboarding again.
+    hasProfile ? { to: '/recommendations', label: 'My Matches' } : { to: '/onboarding', label: 'Find My Path' },
+    { to: '/community', label: 'Community' },
+    { to: '/applications', label: 'My Applications' },
+    { to: '/account', label: 'Account' },
+  ];
+}
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
   return `border-b-2 pb-1 text-sm font-medium transition-colors ${
@@ -26,6 +30,8 @@ function mobileNavLinkClass({ isActive }: { isActive: boolean }) {
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { profile } = useOnboardingProfile();
+  const NAV_LINKS = navLinks(Boolean(profile));
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur">
@@ -48,10 +54,10 @@ export default function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <ThemeToggle />
           <NavLink
-            to="/onboarding"
+            to={profile ? '/onboarding?edit=1' : '/onboarding'}
             className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand/90 active:scale-[0.97]"
           >
-            Get Started
+            {profile ? 'Edit Preferences' : 'Get Started'}
           </NavLink>
         </div>
 

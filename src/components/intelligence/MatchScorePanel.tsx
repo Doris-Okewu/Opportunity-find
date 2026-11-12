@@ -85,7 +85,11 @@ export default function MatchScorePanel({ match, compact = false }: { match: Mat
         <MatchRing percentage={match.percentage} strengthLabel={match.strengthLabel} size={compact ? 56 : 80} />
         <div className="min-w-0 w-full sm:w-auto sm:flex-1">
           <p className="text-xs font-medium uppercase tracking-wide text-ink-3">Estimated Match</p>
-          <Badge tone={STRENGTH_TONE[match.strengthLabel]}>{match.strengthLabel}</Badge>
+          {match.notPersonalMatch ? (
+            <Badge tone="default">Not a personal match</Badge>
+          ) : (
+            <Badge tone={STRENGTH_TONE[match.strengthLabel]}>{match.strengthLabel}</Badge>
+          )}
         </div>
       </div>
 
@@ -105,7 +109,7 @@ export default function MatchScorePanel({ match, compact = false }: { match: Mat
 
       {checks.length > 0 && (
         <div className="mt-3">
-          <p className="mb-1 text-xs font-semibold text-ink-2">Things to check</p>
+          <p className="mb-1 text-xs font-semibold text-ink-2">{match.notPersonalMatch ? 'Why there is no match score' : 'Things to check'}</p>
           <ul className="space-y-1">
             {checks.map((item) => (
               <li key={item} className="flex gap-1.5 text-sm text-milestone">

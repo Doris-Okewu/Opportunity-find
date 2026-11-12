@@ -10,25 +10,25 @@ export interface CareerLevelContent {
 // reads as career-specific without needing 32 hand-written variants.
 const LEVEL_EXPLANATIONS: Record<ExperienceLevel, (careerLabel: string) => string> = {
   student: (careerLabel) =>
-    `As a student exploring ${careerLabel}, start with foundations and core concepts. Use beginner-friendly tools and guided practice to ship a few small first projects before worrying about production polish.`,
+    `As a beginner exploring ${careerLabel}, start with foundations and core concepts. Use beginner-friendly tools and guided practice to ship a few small first projects before worrying about production polish.`,
   entry: (careerLabel) =>
     `At the Entry Level stage, focus on turning your ${careerLabel} foundations into production-ready projects and evidence employers can evaluate — common workplace tools and portfolio readiness matter most now.`,
   intermediate: (careerLabel) =>
     `At the Intermediate stage, go deeper into ${careerLabel} architecture, testing, and performance. This is where you take ownership of larger production work and sharpen collaboration workflows.`,
   senior: (careerLabel) =>
-    `At the Senior stage, ${careerLabel} is less about individual output and more about system-level thinking, strategy, mentoring, and cross-functional influence — your decisions shape how others work.`,
+    `At the Advanced stage, ${careerLabel} is less about individual output and more about system-level thinking, strategy, mentoring, and cross-functional influence — your decisions shape how others work.`,
 };
 
 export function getLevelExplanation(careerLabel: string, level: ExperienceLevel): string {
   return LEVEL_EXPLANATIONS[level](careerLabel);
 }
 
-// Fully-specified so TypeScript enforces every (career path × experience
-// level) combination exists at compile time — the "test" for completeness is
-// `tsc -b` rather than a separate test framework. getCareerLevelContent()
-// still guards the lookup defensively at runtime, since profiles loaded from
-// localStorage aren't type-checked and could carry a stale/unknown value.
-const CAREER_LEVEL_CONTENT: Record<CareerPathSlug, Record<ExperienceLevel, CareerLevelContent>> = {
+// The original eight paths are fully specified per level. getCareerLevelContent()
+// guards the lookup at runtime, since profiles loaded from localStorage aren't
+// type-checked and could carry a stale/unknown value.
+// Partial: newer career paths fall back to their base skills/resources in
+// careerPaths.ts until level-specific content is written for them.
+const CAREER_LEVEL_CONTENT: Partial<Record<CareerPathSlug, Record<ExperienceLevel, CareerLevelContent>>> = {
   frontend: {
     student: {
       skills: [

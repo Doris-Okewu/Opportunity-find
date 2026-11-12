@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useOnboardingProfile } from '../hooks/useOnboardingProfile';
 import { useOpportunities } from '../hooks/useOpportunities';
 import { recommend } from '../features/careerEngine/recommend';
 import { buildReadinessPassport } from '../features/intelligence/readinessPassport';
 import { getCompetencyFramework } from '../features/intelligence/competencyFramework';
-import { calculateMatchScore } from '../features/intelligence/matchScore';
+import { trackSiteEvent } from '../features/tracking/trackSiteEvent';
 import { buildJourneyStripData } from '../features/intelligence/journeyStrip';
 import SkillList from '../components/recommendations/SkillList';
 import ResourceList from '../components/recommendations/ResourceList';
@@ -40,13 +40,11 @@ export default function RecommendationsPage() {
     [passport, competencies],
   );
 
-  const matchedWithScores = useMemo(() => {
-    if (!profile || !result) return [];
-    return result.matchedOpportunities.map((opportunity) => ({
-      opportunity,
-      match: calculateMatchScore(profile, opportunity),
-    }));
-  }, [profile, result]);
+  const matchedWithScores = result?.matches ?? [];
+
+  useEffect(() => {
+    if (profile) trackSiteEvent('recommendations_view', { detail: `${profile.careerPath}:${profile.experienceLevel}` });
+  }, [profile]);
 
   if (!profile) {
     return (
@@ -71,8 +69,8 @@ export default function RecommendationsPage() {
           <h1 className="text-3xl font-bold text-ink">Your Recommendations</h1>
           {result?.careerPath && <p className="mt-1 text-ink-2">{result.careerPath.description}</p>}
         </div>
-        <Link to="/onboarding">
-          <Button variant="secondary">Retake Onboarding</Button>
+        <Link to="/onboarding?edit=1">
+          <Button variant="secondary">Edit preferences</Button>
         </Link>
       </div>
 
@@ -123,9 +121,15 @@ export default function RecommendationsPage() {
       )}
 
       <div>
-        <h2 className="mb-1 text-lg font-semibold text-ink">Opportunities matched to you</h2>
+        <h2 className="mb-1 text-lg font-semibold text-ink">Personalised matches for {result?.careerPath?.label ?? 'your path'}</h2>
         <p className="mb-4 text-sm text-ink-2">
-          Ranked by career-path fit, experience level, opportunity type, and your work-mode preference.
+          Only opportunities listed for your career path (or a closely related field) that fit your experience level
+          are shown here. They are then ranked by experience fit, opportunity type, work mode and location. To see
+          everything else, use{' '}
+          <Link to="/opportunities" className="font-medium text-brand">
+            Browse
+          </Link>{' '}
+          (general discovery, not personalised).
         </p>
 
         {error && <ErrorState message={error} onRetry={refetch} />}
@@ -140,8 +144,8 @@ export default function RecommendationsPage() {
 
         {!error && !loading && matchedWithScores.length === 0 && (
           <EmptyState
-            title="No close matches yet"
-            description="Browse all opportunities to see everything currently available."
+            title={`No current opportunities for ${result?.careerPath?.label ?? 'your path'} yet`}
+            description="We only show opportunities that genuinely fit your career path. New listings are added regularly — meanwhile you can browse everything currently available."
             action={
               <Link to="/opportunities">
                 <Button variant="secondary">Browse All Opportunities</Button>
@@ -153,7 +157,12 @@ export default function RecommendationsPage() {
         {!error && !loading && matchedWithScores.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {matchedWithScores.map(({ opportunity, match }) => (
-              <MatchedOpportunityCard key={opportunity.id} opportunity={opportunity} match={match} />
+              <MatchedOpportunityCard
+                key={opportunity.id}
+                opportunity={opportunity}
+                match={match}
+                onClick={() => trackSiteEvent('recommendation_click', { opportunityId: opportunity.id })}
+              />
             ))}
           </div>
         )}

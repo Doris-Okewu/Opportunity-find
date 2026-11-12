@@ -9,4 +9,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// Snapshot of the landing URL taken BEFORE supabase-js reads (and clears) any
+// auth tokens or errors from it, so the email-confirmation page can tell the
+// user what happened. Contains no secrets once copied: only the hash/query
+// keys are inspected (see pages/AuthConfirmPage.tsx).
+export const initialAuthUrl = {
+  pathname: typeof window !== 'undefined' ? window.location.pathname : '/',
+  hash: typeof window !== 'undefined' ? window.location.hash : '',
+  search: typeof window !== 'undefined' ? window.location.search : '',
+};
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
