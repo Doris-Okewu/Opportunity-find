@@ -15,6 +15,7 @@ import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Accordion from '../components/ui/Accordion';
+import Select from '../components/ui/Select';
 import DeadlineBadge from '../components/opportunities/DeadlineBadge';
 import ErrorState from '../components/opportunities/ErrorState';
 import EmptyState from '../components/opportunities/EmptyState';
@@ -27,6 +28,16 @@ import AIInsightPanel from '../components/intelligence/AIInsightPanel';
 import ReadinessPassportCard from '../components/intelligence/ReadinessPassportCard';
 import SkillLadderPanel from '../components/intelligence/SkillLadderPanel';
 import CompetencyList from '../components/intelligence/CompetencyList';
+import OpportunityDiscussion from '../components/community/OpportunityDiscussion';
+import { trackOpportunityEvent } from '../features/tracking/trackOpportunityEvent';
+import {
+  APPLICATION_STATUSES,
+  APPLICATION_STATUS_LABELS,
+  recordApplyOpened,
+  updateApplication,
+} from '../features/applications/applicationsStore';
+import type { ApplicationStatus } from '../features/applications/applicationsStore';
+import { useApplications } from '../hooks/useApplications';
 
 function SectionHeading({ children }: { children: ReactNode }) {
   return <h2 className="mb-4 text-xl font-bold text-ink">{children}</h2>;
@@ -38,6 +49,8 @@ export default function OpportunityDetailPage() {
   const [opportunity, setOpportunity] = useState<Opportunity | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
+  const applications = useApplications();
+  const application = id ? applications.find((a) => a.opportunityId === id) : undefined;
 
   useEffect(() => {
     if (!id) return;
@@ -59,6 +72,11 @@ export default function OpportunityDetailPage() {
       cancelled = true;
     };
   }, [id, reloadToken]);
+
+  // Anonymous view tracking — fire-and-forget, only for published listings.
+  useEffect(() => {
+    if (opportunity && opportunity.is_published) trackOpportunityEvent(opportunity.id, 'detail_view');
+  }, [opportunity]);
 
   const passport = useMemo(() => (profile ? buildReadinessPassport(profile) : undefined), [profile]);
   const competencies = useMemo(
@@ -113,6 +131,13 @@ export default function OpportunityDetailPage() {
   const isUrgent = intelligence
     ? ['expired', 'critical', 'urgent'].includes(intelligence.deadlinePlan.band)
     : false;
+
+  const current = opportunity;
+  function handleApplyOpened() {
+    // Never preventDefault / await: the browser opens the link immediately.
+    recordApplyOpened(current);
+    trackOpportunityEvent(current.id, 'apply_click');
+  }
 
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
@@ -246,6 +271,11 @@ export default function OpportunityDetailPage() {
         )}
       </div>
 
+      <div className="mt-6 rounded-2xl border border-border bg-surface-2 p-6">
+        <SectionHeading>Discussion</SectionHeading>
+        <OpportunityDiscussion opportunityId={opportunity.id} />
+      </div>
+
       {/* Apply */}
       <div className="mt-10 border-t border-border pt-6">
         {expired ? (
@@ -253,20 +283,62 @@ export default function OpportunityDetailPage() {
             Applications closed
           </Button>
         ) : (
-          <a href={opportunity.application_url} target="_blank" rel="noopener noreferrer">
-            <Button>
-              Apply on official site
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path
-                  fillRule="evenodd"
-                  d="M5.22 14.78a.75.75 0 0 0 1.06 0l7.22-7.22v5.69a.75.75 0 0 0 1.5 0v-7.5a.75.75 0 0 0-.75-.75h-7.5a.75.75 0 0 0 0 1.5h5.69l-7.22 7.22a.75.75 0 0 0 0 1.06Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </Button>
+          <a
+            href={opportunity.application_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleApplyOpened}
+            onAuxClick={(e) => {
+              if (e.button === 1) handleApplyOpened();
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:scale-[0.97]"
+          >
+            Apply on official site
+            <span className="sr-only">(opens in a new tab)</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+              <path
+                fillRule="evenodd"
+                d="M5.22 14.78a.75.75 0 0 0 1.06 0l7.22-7.22v5.69a.75.75 0 0 0 1.5 0v-7.5a.75.75 0 0 0-.75-.75h-7.5a.75.75 0 0 0 0 1.5h5.69l-7.22 7.22a.75.75 0 0 0 0 1.06Z"
+                clipRule="evenodd"
+              />
+            </svg>
           </a>
         )}
         <p className="mt-2 text-xs text-ink-3">You'll be redirected to the official application page.</p>
+
+        {application && (
+          <div className="mt-6 rounded-xl border border-border bg-surface-2 p-4" aria-live="polite">
+            <label htmlFor="application-status" className="block text-sm font-semibold text-ink">
+              {application.status === 'opened' ? 'Did you submit your application?' : 'Your application status'}
+            </label>
+            <p className="mt-1 text-xs text-ink-3">
+              Saved only in this browser. Update it as things progress — it's for your own tracking.
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="w-full sm:w-64">
+                <Select
+                  id="application-status"
+                  value={application.status}
+                  onChange={(e) => updateApplication(application.opportunityId, { status: e.target.value as ApplicationStatus })}
+                >
+                  {APPLICATION_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {APPLICATION_STATUS_LABELS[s]}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              {application.status === 'opened' && (
+                <Button variant="secondary" onClick={() => updateApplication(application.opportunityId, { status: 'applied' })}>
+                  Yes, I applied
+                </Button>
+              )}
+              <Link to="/applications" className="text-sm font-medium text-brand">
+                View My Applications &rarr;
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

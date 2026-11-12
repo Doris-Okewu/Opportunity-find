@@ -5,6 +5,9 @@ import ThemeToggle from './ThemeToggle';
 const NAV_LINKS = [
   { to: '/opportunities', label: 'Browse' },
   { to: '/onboarding', label: 'Find My Path' },
+  { to: '/community', label: 'Community' },
+  { to: '/applications', label: 'My Applications' },
+  { to: '/account', label: 'Account' },
 ];
 
 function navLinkClass({ isActive }: { isActive: boolean }) {

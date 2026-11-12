@@ -64,9 +64,15 @@ export default function AdminDashboardPage() {
             {loading ? 'Loading...' : `${opportunities.length} total opportunities`}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link to="/admin/opportunities/new">
             <Button>New Opportunity</Button>
+          </Link>
+          <Link to="/admin/analytics">
+            <Button variant="secondary">Analytics</Button>
+          </Link>
+          <Link to="/admin/moderation">
+            <Button variant="secondary">Moderation</Button>
           </Link>
           <Button variant="secondary" onClick={() => signOutAdmin()}>
             Sign Out

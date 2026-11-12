@@ -17,6 +17,13 @@ const OpportunitiesPage = lazy(() => import('./pages/OpportunitiesPage'));
 const OpportunityDetailPage = lazy(() => import('./pages/OpportunityDetailPage'));
 const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
 const RecommendationsPage = lazy(() => import('./pages/RecommendationsPage'));
+const MyApplicationsPage = lazy(() => import('./pages/MyApplicationsPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
+const CommunitiesPage = lazy(() => import('./pages/CommunitiesPage'));
+const CommunityPage = lazy(() => import('./pages/CommunityPage'));
+const CommunityPostPage = lazy(() => import('./pages/CommunityPostPage'));
+const AdminModerationPage = lazy(() => import('./pages/admin/AdminModerationPage'));
+const AdminAnalyticsPage = lazy(() => import('./pages/admin/AdminAnalyticsPage'));
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
 const AdminResetPasswordPage = lazy(() => import('./pages/admin/AdminResetPasswordPage'));
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
@@ -43,10 +50,17 @@ export default function App() {
             <Route path="opportunities/:id" element={<OpportunityDetailPage />} />
             <Route path="onboarding" element={<OnboardingPage />} />
             <Route path="recommendations" element={<RecommendationsPage />} />
+            <Route path="applications" element={<MyApplicationsPage />} />
+            <Route path="account" element={<AccountPage />} />
+            <Route path="community" element={<CommunitiesPage />} />
+            <Route path="community/posts/:id" element={<CommunityPostPage />} />
+            <Route path="community/:slug" element={<CommunityPage />} />
             <Route path="admin/login" element={<AdminLoginPage />} />
             <Route path="admin/reset-password" element={<AdminResetPasswordPage />} />
             <Route element={<AdminGuard />}>
               <Route path="admin" element={<AdminDashboardPage />} />
+              <Route path="admin/analytics" element={<AdminAnalyticsPage />} />
+              <Route path="admin/moderation" element={<AdminModerationPage />} />
               <Route path="admin/opportunities/new" element={<AdminOpportunityFormPage />} />
               <Route path="admin/opportunities/:id/edit" element={<AdminOpportunityFormPage />} />
             </Route>

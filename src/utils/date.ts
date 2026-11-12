@@ -33,3 +33,12 @@ export function deadlineCountdownLabel(deadline: string | null): string {
   if (days === 1) return '1 day left';
   return `${days} days left`;
 }
+
+export function formatPostedAt(iso: string): string {
+  const diffMin = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `${diffH} h ago`;
+  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
